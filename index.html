@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="https://www.knowledgecity.com/favicon.ico">
+  <title>Knowledge City Login</title>
+  <link
+   rel="stylesheet"
+   href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+   integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+   crossorigin="anonymous"
+  >
+  <link rel="stylesheet" href="css/main.css">
+ </head>
+ <body class="text-center">
+  <form class="form-signin">
+   <img class="mb-5" src="img/logo.svg" alt="logo" height="100">
+   <div class="text-left md-text font-weight-bold mt-2 mb-5">
+    Welcome to the Learning Management System<br>
+    <span class="sm-text font-weight-normal">Please log in to continue</span>
+   </div>
+   <input type="text" id="user" class="form-control user-bkg" placeholder="Username" required autofocus>
+   <input type="password" id="pass" class="form-control pass-bkg" placeholder="Password" required>
+   <div class="checkbox mb-4 text-left ml-3">
+    <label>
+     <input type="checkbox" id="remember" class="mt-2"> Remember me
+    </label>
+   </div>
+   <div id="error" class="mb-1">&nbsp;</div>
+   <span class="btn btn-lg btn-orange btn-login" onclick="doLogin()">
+    <span style="float:left;">Log in</span>
+    <span class="chevron">&nbsp; &rsaquo; &nbsp;</span>
+   </span>
+   <div class="input-group mb-3">
+  </div>
+  </form>
+  <script type="text/javascript">
+   function _( el ) { return document.getElementById( el ) }
+
+   async function postData( url = '', data = {} ) {
+    const response = await fetch( url, {
+     method: 'POST',
+     mode: 'cors',
+     cache: 'no-cache',
+     headers: { 'Content-Type': 'application/json' },
+     redirect: 'follow',
+     referrerPolicy: 'no-referrer',
+     body: JSON.stringify( data )
+    } );
+    return await response.json();
+   }
+
+   function getCookie( name ) {
+    var match = document.cookie.match( new RegExp( '(^| )' + name + '=([^;]+)' ) );
+    if ( match ) return match[ 2 ];
+    else return false;
+   }
+
+   function doLogin() {
+    let u = _( "user" ).value, p = _( "pass" ).value, rm = _( "remember" ).checked;
+    if ( u != "" && p != "" ) {
+     postData( '/api/auth', { "user": u, "pass": p } ).then( ( data ) => {
+      if ( data.success == true ) {
+       document.cookie = 'token=' + data.token + '; Max-Age=86400; path=/';
+       if ( rm ) {
+        document.cookie = 'user=' + u + '; Max-Age=604800; path=/';
+        document.cookie = 'pass=' + p + '; Max-Age=604800; path=/';       
+       }
+       window.location.replace( "list.html" );
+      }
+      else if ( data.error == "user" ) { _( "error" ).innerText = "User doesn't exist"; }
+      else if ( data.error == "pass" ) { _( "error" ).innerText = "Wrong password"; }
+      else if ( data.error == "dead" ) { _( "error" ).innerText = "Account deactivated"; }
+     } );
+    }
+    else { _( "error" ).innerText = "Make sure to fill both username and password fields"; }
+   }
+
+   document.addEventListener( 'DOMContentLoaded', function() {
+    console.log( "Dex says: Document loaded." )
+    let user = getCookie( "user" ), pass = getCookie( "pass" );
+    if( user && pass ) {
+     _( "user" ).value = user;
+     _( "pass" ).value = pass;
+    }
+   } );
+  </script>
+ </body>
+</html>
+

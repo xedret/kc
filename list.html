@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="https://www.knowledgecity.com/favicon.ico">
+  <title>Knowledge City Login</title>
+  <link
+   rel="stylesheet"
+   href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+   integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+   crossorigin="anonymous"
+  >
+  <link rel="stylesheet" href="css/main.css">
+  <style type="text/css">
+   .content {
+    width: 100%;
+    max-width: 85vw;
+    padding: 1vw;
+    margin: auto;
+   }
+   thead, th { background-color: #e98c3b; padding: 0px !important; }
+   .logout { position: fixed; bottom: 0; width: 100vw; background-color: #eee; padding: .7vh; }
+   .logout:hover { background-color: #ccc; cursor: pointer; }
+   nav { max-width: 20vw; margin: auto; }
+   .act { font-weight: bold; text-decoration: underline; }
+  </style>
+ </head>
+ <body class="text-center">
+  <div class="content">
+   <h1>User List</h1>
+   <table class="table table-striped table-hover">
+    <thead><tr><th scope="col" colspan="5">&nbsp;</th></tr></thead>
+    <tbody id="students"><!--Dex will insert students here--></tbody>
+   </table>
+   <div class="mb-5">
+    <nav class="mb-5">
+     <ul id="pages" class="pagination"></ul>
+    </nav>
+   </div>
+  </div>
+  <div class="logout" onclick="ltfo()">
+   <span>Log Out</span>
+  </div>
+  <script type="text/javascript">
+   var token = "", page = 1, students;
+   function _( el ) { return document.getElementById( el ) }
+   function getQueryParameters() {
+    return document.location.search.replace( /(^\?)/, '' ).split( '&' ).reduce( function( o, n ) {
+     n = n.split( '=' );
+     o[ n[ 0 ] ] = n[ 1 ];
+     return o
+    }, {} );
+   }
+
+   async function getData( url = '', token ) {
+    const response = await fetch( url, {
+     method: 'GET',
+     mode: 'cors',
+     cache: 'no-cache',
+     headers: { 'Content-Type': 'application/json', 'token': token },
+     redirect: 'follow',
+     referrerPolicy: 'no-referrer',
+    } );
+    return await response.json();
+   }
+
+   function ltfo() {
+    let token = getCookie( 'token' );
+    getData( '/api/auth', { 'token' : token }, "DELETE" ).then( ( data ) => {
+     document.cookie = "token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
+     window.location.replace( 'index.html' );
+    } );
+   }
+
+   function getCookie( name ) {
+    var match = document.cookie.match( new RegExp( '(^| )' + name + '=([^;]+)' ) );
+    if ( match ) return match[ 2 ];
+    else return false;
+   }
+
+   function removeClass( _class ) {
+    [].forEach.call( document.getElementsByClassName( _class ), function( el ) { el.classList.remove( _class ); } );
+   }
+
+   function cp( caller, pageIndex ) {
+    page = pageIndex;
+    s = _( "students" );
+    s.innerHTML = "";
+    removeClass( "act" );
+    fillTable( pageIndex );
+    if ( caller != "none" ) {
+     caller.classList.add( "act" );
+    }
+   }
+
+   function next() {
+    let s = _( "students" ), np = parseInt( students.length / 5 );
+    if ( page != np ) {
+     cp( "none", page + 1 );
+     p.childNodes[ page ].classList.add( 'act' );
+    }
+   }
+
+   function previous() {
+    let s = _( "students" ), np = parseInt( students.length / 5 );
+    if ( page != 1 ) {
+     cp( "none", page - 1 );
+     p.childNodes[ page ].classList.add( 'act' );
+    }
+   }
+
+   function fillTable( page = 1 ) {
+    let otd = "<td>", ctd = "</td>", cotd = ctd + otd, s = _( "students" );
+    let ab = '<span class="badge badge-pill badge-success">&check;</span>', np = parseInt( students.length / 5 );
+    let ib = '<span class="badge badge-pill badge-danger">&#10008;</span>'; li = 5 * page;
+    for ( var i = ( page * 5 ) - 5 ; i < li; i++ ) {
+     cs = students[ i ]; // Current Student
+     let b = cs.active ? ab : ib;
+     let tr = '<tr><td>' + b + " &nbsp;" + cs.name + " " + cs.lname + cotd + cs.email + "</td></tr>";
+     s.innerHTML += tr;
+    }
+   }
+
+   function fillPagination() {
+    p = _( "pages" ), np = parseInt( students.length / 5 );
+    ps = '<li class="page-item"><a class="page-link" onclick="previous()" href="#">Previous</a></li>';
+    ps += '<li class="page-item"><a class="page-link" onclick="cp(this, 1)" href="#">1</a></li>';
+    for ( var i = 2; i < np + 1; i++ ) {
+     ps += '<li class="page-item"><a class="page-link" onclick="cp( this,' + ( i ) + ')" href="#">' + i + '</a></li>';
+    }
+    ps += '<li class="page-item"><a class="page-link" onclick="next()" href="#">Next</a></li>'
+    p.innerHTML = ps;
+    p.childNodes[ 1 ].classList.add( 'act' );
+   }
+
+   document.addEventListener( 'DOMContentLoaded', function() {
+    console.log( "Dex says: Document loaded." );
+    if ( !document.cookie.split( ';' ).filter( ( item ) => item.trim().startsWith( 'token=' ) ).length ) {
+     console.log( 'No token found, bye.' );
+     window.location.replace( "index.html" );
+    }
+    else {
+     let otd = "<td>", ctd = "</td>", cotd = ctd + otd;
+     getData( '/api/users', getCookie( 'token' ) ).then( ( data ) => {
+      if ( data.success ) {
+       students = data.students;
+       fillPagination();
+       fillTable();
+      }
+      else { window.location.replace( "index.html" ); }
+     } )
+    }
+   } );
+  </script>
+ </body>
+</html>

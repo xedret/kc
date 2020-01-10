@@ -1,0 +1,49 @@
+   html, body { height: 100%; }
+   body {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+   }
+
+   .form-signin {
+    width: 100%;
+    max-width: 440px;
+    padding: 15px;
+    margin: auto;
+   }
+   .form-signin .checkbox { font-size: .9rem; font-weight: 500; }
+   .form-signin .form-control {
+    position: relative;
+    box-sizing: border-box;
+    height: auto;
+    padding: 10px;
+    font-size: 16px;
+   }
+   .form-signin .form-control:focus { z-index: 2; }
+   .form-signin input[type="text"] {
+    border-color: #aaa;
+    font-size: .8rem;
+    padding: .6rem 1rem .6rem 2.5rem;
+    margin-bottom: 1rem;
+    border-radius: 2rem;
+   }
+   .form-signin input[type="password"] {
+    border-color: #aaa;
+    font-size: .8rem;
+    padding: .6rem 1rem .6rem 2.5rem;
+    margin-bottom: 10px;
+    border-radius: 2rem;
+   }
+
+   .md-text { font-size:  1.1rem; line-height: .9rem; }
+   .sm-text { font-size:   .8rem; line-height: .1rem; }
+   .user-bkg { background-image:url( '../img/user.svg'); background-repeat: no-repeat; background-position: left .5rem top; }
+   .pass-bkg { background-image:url( '../img/password.svg' ); background-repeat: no-repeat; background-position: left .5rem top; }
+   .btn-orange { background-color: #e98c3b; color: #fff; }
+   .btn-login { width: 100%; border-radius: 2rem; }
+   .btn-login:hover { color: #fff; background-color: #db5d00 }
+   .chevron { font-size: 1.2rem; text-align: text-middle; border-radius: 1.5rem; float:right }
